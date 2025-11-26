@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35919.96 d17.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HisseAnalizUygulamasi", "HisseAnalizUygulamasi\HisseAnalizUygulamasi.csproj", "{9E6FE700-9487-4B77-AF2F-5BB36A613EEE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9E6FE700-9487-4B77-AF2F-5BB36A613EEE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9E6FE700-9487-4B77-AF2F-5BB36A613EEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9E6FE700-9487-4B77-AF2F-5BB36A613EEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9E6FE700-9487-4B77-AF2F-5BB36A613EEE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0A1313E8-4E16-4912-9F62-8116D9129E04}
+	EndGlobalSection
+EndGlobal

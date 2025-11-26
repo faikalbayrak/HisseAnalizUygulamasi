@@ -1,0 +1,326 @@
+﻿<Window x:Class="HisseAnalizUygulamasi.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Hisse Adil Değer Hesaplama" Height="900" Width="600"
+        Background="{DynamicResource BackgroundBrush}"
+        Loaded="Window_Loaded">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="20">
+
+            <!-- Başlık ve Tema Toggle -->
+            <Grid Margin="0,0,0,10">
+                <TextBlock Text="Hisse Adil Değer Hesaplama" 
+                           FontSize="24" FontWeight="Bold" 
+                           HorizontalAlignment="Center"
+                           Foreground="{DynamicResource TextPrimaryBrush}"/>
+
+                <Button x:Name="BtnToggleTheme"
+                        Content="🌙"
+                        Click="BtnToggleTheme_Click"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        FontSize="24"
+                        Width="40"
+                        Height="40"
+                        HorizontalAlignment="Right"
+                        Cursor="Hand"
+                        ToolTip="Tema Değiştir"/>
+            </Grid>
+
+            <!-- Karşılaştırma ve Çeyrek Analizi ve Geçmiş Butonları Butonları -->
+            <UniformGrid Columns="3" Margin="0,0,0,20">
+                <Button x:Name="BtnOpenComparison"
+            Content="⚖️ KARŞILAŞTIR"
+            Click="BtnOpenComparison_Click"
+            Background="{DynamicResource PrimaryBrush}"
+            Foreground="White"
+            FontWeight="Bold"
+            FontSize="11"
+            Padding="6"
+            Margin="0,0,3,0"
+            Cursor="Hand"/>
+
+                <Button x:Name="BtnOpenQuarterly"
+            Content="📊 ÇEYREK ANALİZİ"
+            Click="BtnOpenQuarterly_Click"
+            Background="{DynamicResource SecondaryBrush}"
+            Foreground="White"
+            FontWeight="Bold"
+            FontSize="11"
+            Padding="6"
+            Margin="3,0,3,0"
+            Cursor="Hand"/>
+
+                <Button x:Name="BtnOpenHistory"
+            Content="📈 GEÇMİŞ KAYITLAR"
+            Click="BtnOpenHistory_Click"
+            Background="#FF6F00"
+            Foreground="White"
+            FontWeight="Bold"
+            FontSize="11"
+            Padding="6"
+            Margin="3,0,0,0"
+            Cursor="Hand"/>
+            </UniformGrid>
+
+            <!-- Sık Kullanılanlar Paneli -->
+            <Border Background="{DynamicResource SurfaceBrush}" 
+                    CornerRadius="5" 
+                    Padding="15" 
+                    Margin="0,0,0,15"
+                    BorderBrush="{DynamicResource BorderBrush}"
+                    BorderThickness="1">
+                <StackPanel>
+                    <TextBlock Text="Sık Kullanılanlar" 
+                               FontSize="16" FontWeight="Bold" 
+                               Margin="0,0,0,10"
+                               Foreground="{DynamicResource TextPrimaryBrush}"/>
+
+                    <ScrollViewer HorizontalScrollBarVisibility="Auto" 
+                                  VerticalScrollBarVisibility="Disabled"
+                                  Height="60">
+                        <WrapPanel x:Name="FavoritesPanel" Orientation="Horizontal"/>
+                    </ScrollViewer>
+
+                    <TextBlock x:Name="txtNoFavorites"
+                               Text="Henüz sık kullanılan sembol yok."
+                               TextWrapping="Wrap"
+                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               FontStyle="Italic"
+                               Margin="0,10,0,0"
+                               Visibility="Visible"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Hisse Sembolü Girişi -->
+            <Border Background="{DynamicResource SurfaceBrush}" 
+                    CornerRadius="5" 
+                    Padding="15" 
+                    Margin="0,0,0,15"
+                    BorderBrush="{DynamicResource BorderBrush}"
+                    BorderThickness="1">
+                <StackPanel>
+                    <TextBlock Text="Hisse Sembolü" 
+                               FontWeight="Bold" 
+                               Margin="0,0,0,5"
+                               Foreground="{DynamicResource TextPrimaryBrush}"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBox x:Name="txtSymbol" 
+                                 Grid.Column="0"
+                                 FontSize="16" 
+                                 Padding="5"
+                                 CharacterCasing="Upper"
+                                 Margin="0,0,10,0"
+                                 Background="{DynamicResource SurfaceBrush}"
+                                 Foreground="{DynamicResource TextPrimaryBrush}"
+                                 BorderBrush="{DynamicResource BorderBrush}"/>
+
+                        <Button x:Name="BtnAddFavorite"
+                                Grid.Column="1"
+                                Content="⭐"
+                                Click="BtnAddFavorite_Click"
+                                Background="{DynamicResource AccentBrush}"
+                                Foreground="White"
+                                FontSize="18"
+                                Width="40"
+                                Height="35"
+                                Cursor="Hand"
+                                ToolTip="Sık Kullanılanlara Ekle"/>
+                    </Grid>
+
+                    <Button x:Name="BtnFetchData" 
+                            Content="WEB'DEN GERÇEK VERİ ÇEK" 
+                            Click="BtnFetchData_Click"
+                            Background="{DynamicResource PrimaryBrush}" 
+                            Foreground="White"
+                            FontWeight="Bold"
+                            Padding="10"
+                            Margin="0,10,0,0"
+                            Cursor="Hand"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Şirket Bilgileri -->
+            <Border Background="{DynamicResource SurfaceBrush}" 
+                    CornerRadius="5" 
+                    Padding="15" 
+                    Margin="0,0,0,15"
+                    BorderBrush="{DynamicResource BorderBrush}"
+                    BorderThickness="1">
+                <StackPanel>
+                    <TextBlock Text="Şirket Bilgileri" 
+                               FontSize="18" FontWeight="Bold" 
+                               Margin="0,0,0,10"
+                               Foreground="{DynamicResource TextPrimaryBrush}"/>
+
+                    <TextBlock Text="Şirket Adı" 
+                               FontWeight="Bold" 
+                               Margin="0,5,0,3"
+                               Foreground="{DynamicResource TextPrimaryBrush}"/>
+                    <TextBox x:Name="txtCompanyName" 
+                             IsReadOnly="True" 
+                             Background="{DynamicResource InputBackgroundBrush}"
+                             Foreground="{DynamicResource TextPrimaryBrush}"
+                             Padding="5"/>
+
+                    <TextBlock Text="Güncel Fiyat (TL)" 
+                               FontWeight="Bold" 
+                               Margin="0,10,0,3"
+                               Foreground="{DynamicResource TextPrimaryBrush}"/>
+                    <TextBox x:Name="txtCurrentPrice" 
+                             IsReadOnly="True" 
+                             Background="{DynamicResource InputBackgroundBrush}"
+                             Foreground="{DynamicResource TextPrimaryBrush}"
+                             Padding="5"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Bilanço Verileri -->
+            <Border Background="{DynamicResource SurfaceBrush}" 
+                    CornerRadius="5" 
+                    Padding="15" 
+                    Margin="0,0,0,15"
+                    BorderBrush="{DynamicResource BorderBrush}"
+                    BorderThickness="1">
+                <StackPanel>
+                    <TextBlock Text="Bilanço Verileri (Bin TL)" 
+                               FontSize="18" FontWeight="Bold" 
+                               Margin="0,0,0,10"
+                               Foreground="{DynamicResource TextPrimaryBrush}"/>
+
+                    <TextBlock Text="Toplam Kaynaklar" 
+                               FontWeight="Bold" 
+                               Margin="0,5,0,3"
+                               Foreground="{DynamicResource TextPrimaryBrush}"/>
+                    <TextBox x:Name="txtTotalResources" 
+                             IsReadOnly="True" 
+                             Background="{DynamicResource InputBackgroundBrush}"
+                             Foreground="{DynamicResource TextPrimaryBrush}"
+                             Padding="5"/>
+
+                    <TextBlock Text="Toplam Uzun Vadeli Yükümlülükler" 
+                               FontWeight="Bold" 
+                               Margin="0,10,0,3"
+                               Foreground="{DynamicResource TextPrimaryBrush}"/>
+                    <TextBox x:Name="txtLongTerm" 
+                             IsReadOnly="True" 
+                             Background="{DynamicResource InputBackgroundBrush}"
+                             Foreground="{DynamicResource TextPrimaryBrush}"
+                             Padding="5"/>
+
+                    <TextBlock Text="Toplam Kısa Vadeli Yükümlülükler" 
+                               FontWeight="Bold" 
+                               Margin="0,10,0,3"
+                               Foreground="{DynamicResource TextPrimaryBrush}"/>
+                    <TextBox x:Name="txtShortTerm" 
+                             IsReadOnly="True" 
+                             Background="{DynamicResource InputBackgroundBrush}"
+                             Foreground="{DynamicResource TextPrimaryBrush}"
+                             Padding="5"/>
+
+                    <TextBlock Text="Çalışanlara Sağlanan Faydalar (Toplam)" 
+                               FontWeight="Bold" 
+                               Margin="0,10,0,3"
+                               Foreground="{DynamicResource TextPrimaryBrush}"/>
+                    <TextBox x:Name="txtEmployeeBenefits" 
+                             IsReadOnly="True" 
+                             Background="{DynamicResource InputBackgroundBrush}"
+                             Foreground="{DynamicResource TextPrimaryBrush}"
+                             Padding="5"/>
+
+                    <TextBlock Text="Ödenmiş Sermaye" 
+                               FontWeight="Bold" 
+                               Margin="0,10,0,3"
+                               Foreground="{DynamicResource TextPrimaryBrush}"/>
+                    <TextBox x:Name="txtPaidCapital" 
+                             IsReadOnly="True" 
+                             Background="{DynamicResource InputBackgroundBrush}"
+                             Foreground="{DynamicResource TextPrimaryBrush}"
+                             Padding="5"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Hesapla Butonu -->
+            <Button x:Name="BtnCalculate" 
+                    Content="HESAPLA" 
+                    Click="BtnCalculate_Click"
+                    Background="{DynamicResource SecondaryBrush}" 
+                    Foreground="White"
+                    FontSize="18"
+                    FontWeight="Bold"
+                    Padding="15"
+                    Margin="0,0,0,15"
+                    Cursor="Hand"/>
+
+            <!-- Sonuçlar Paneli -->
+            <Border x:Name="ResultPanel" 
+                    Background="{DynamicResource SurfaceBrush}" 
+                    CornerRadius="5" 
+                    Padding="15"
+                    Visibility="Collapsed"
+                    BorderBrush="{DynamicResource BorderBrush}"
+                    BorderThickness="1">
+                <StackPanel>
+                    <TextBlock Text="Hesaplama Sonuçları" 
+                               FontSize="18" FontWeight="Bold" 
+                               Margin="0,0,0,10"
+                               Foreground="{DynamicResource TextPrimaryBrush}"/>
+
+                    <TextBlock Text="Adil Değer (TL)" 
+                               FontWeight="Bold" 
+                               Margin="0,5,0,3"
+                               Foreground="{DynamicResource TextPrimaryBrush}"/>
+                    <TextBox x:Name="txtAdilDeger" 
+                             IsReadOnly="True" 
+                             Background="#E8F5E9"
+                             FontSize="16"
+                             FontWeight="Bold"
+                             Padding="5"/>
+
+                    <TextBlock Text="İskonto Oranı" 
+                               FontWeight="Bold" 
+                               Margin="0,10,0,3"
+                               Foreground="{DynamicResource TextPrimaryBrush}"/>
+                    <TextBox x:Name="txtIskonto" 
+                             IsReadOnly="True" 
+                             Background="#FFF9C4"
+                             FontSize="16"
+                             FontWeight="Bold"
+                             Padding="5"/>
+
+                    <TextBlock Text="Kategori" 
+                               FontWeight="Bold" 
+                               Margin="0,10,0,3"
+                               Foreground="{DynamicResource TextPrimaryBrush}"/>
+                    <Border x:Name="KategoriPanel" 
+                            Background="LightGray" 
+                            CornerRadius="3" 
+                            Padding="10">
+                        <TextBox x:Name="txtKategori" 
+                                 IsReadOnly="True" 
+                                 Background="Transparent"
+                                 BorderThickness="0"
+                                 FontSize="16"
+                                 FontWeight="Bold"
+                                 TextAlignment="Center"/>
+                    </Border>
+
+                    <TextBlock Text="Formül:" 
+                               FontWeight="Bold" 
+                               Margin="0,15,0,5"
+                               Foreground="{DynamicResource TextPrimaryBrush}"/>
+                    <TextBlock Text="(Toplam Kaynaklar + Uzun Vadeli Yük + Kısa Vadeli Yük - Çalışan Borçları) / Ödenmiş Sermaye"
+                               TextWrapping="Wrap"
+                               FontStyle="Italic"
+                               Foreground="{DynamicResource TextSecondaryBrush}"/>
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
+</Window>

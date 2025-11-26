@@ -1,0 +1,185 @@
+﻿<Window x:Class="HisseAnalizUygulamasi.ComparisonWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Hisse Karşılaştırma" Height="900" Width="1000"
+        Background="#F5F5F5"
+        WindowStartupLocation="CenterOwner">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="20">
+
+            <!-- Başlık -->
+            <TextBlock Text="⚖️ İki Hisse Karşılaştırma" 
+                       FontSize="26" FontWeight="Bold" 
+                       HorizontalAlignment="Center" 
+                       Margin="0,0,0,20"/>
+
+            <!-- Sembol Seçimi -->
+            <Border Background="White" CornerRadius="5" Padding="20" Margin="0,0,0,20">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="20"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Sol Hisse -->
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="1. HİSSE" 
+                                   FontSize="18" FontWeight="Bold" 
+                                   Foreground="#2196F3"
+                                   HorizontalAlignment="Center"
+                                   Margin="0,0,0,10"/>
+
+                        <TextBlock Text="Sembol" FontWeight="Bold" Margin="0,0,0,5"/>
+                        <TextBox x:Name="txtSymbol1" 
+                                 FontSize="16" 
+                                 Padding="8"
+                                 CharacterCasing="Upper"
+                                 TextAlignment="Center"/>
+
+                        <Button x:Name="BtnFetch1"
+                                Content="VERİ ÇEK"
+                                Click="BtnFetch1_Click"
+                                Background="#2196F3"
+                                Foreground="White"
+                                FontWeight="Bold"
+                                Padding="10"
+                                Margin="0,10,0,0"
+                                Cursor="Hand"/>
+                    </StackPanel>
+
+                    <!-- VS İkonu -->
+                    <TextBlock Grid.Column="1"
+                               Text="VS"
+                               FontSize="20"
+                               FontWeight="Bold"
+                               Foreground="#9C27B0"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Center"/>
+
+                    <!-- Sağ Hisse -->
+                    <StackPanel Grid.Column="2">
+                        <TextBlock Text="2. HİSSE" 
+                                   FontSize="18" FontWeight="Bold" 
+                                   Foreground="#4CAF50"
+                                   HorizontalAlignment="Center"
+                                   Margin="0,0,0,10"/>
+
+                        <TextBlock Text="Sembol" FontWeight="Bold" Margin="0,0,0,5"/>
+                        <TextBox x:Name="txtSymbol2" 
+                                 FontSize="16" 
+                                 Padding="8"
+                                 CharacterCasing="Upper"
+                                 TextAlignment="Center"/>
+
+                        <Button x:Name="BtnFetch2"
+                                Content="VERİ ÇEK"
+                                Click="BtnFetch2_Click"
+                                Background="#4CAF50"
+                                Foreground="White"
+                                FontWeight="Bold"
+                                Padding="10"
+                                Margin="0,10,0,0"
+                                Cursor="Hand"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Karşılaştırma Sonuçları -->
+            <Border x:Name="ComparisonPanel" 
+                    Background="White" 
+                    CornerRadius="5" 
+                    Padding="20"
+                    Visibility="Collapsed">
+                <StackPanel>
+                    <TextBlock Text="KARŞILAŞTIRMA SONUÇLARI" 
+                               FontSize="20" FontWeight="Bold" 
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,20"/>
+
+                    <!-- Şirket Adları -->
+                    <Grid Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="150"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock x:Name="txtCompanyName1"
+                                   Grid.Column="0"
+                                   FontSize="14"
+                                   FontWeight="Bold"
+                                   TextAlignment="Center"
+                                   Foreground="#2196F3"
+                                   TextWrapping="Wrap"/>
+
+                        <TextBlock Grid.Column="1"
+                                   Text="ŞİRKET ADI"
+                                   FontSize="12"
+                                   FontWeight="Bold"
+                                   TextAlignment="Center"
+                                   Foreground="Gray"/>
+
+                        <TextBlock x:Name="txtCompanyName2"
+                                   Grid.Column="2"
+                                   FontSize="14"
+                                   FontWeight="Bold"
+                                   TextAlignment="Center"
+                                   Foreground="#4CAF50"
+                                   TextWrapping="Wrap"/>
+                    </Grid>
+
+                    <Separator Margin="0,10,0,10"/>
+
+                    <!-- Karşılaştırma Satırları -->
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="600">
+                        <StackPanel x:Name="ComparisonRows"/>
+                    </ScrollViewer>
+
+                    <Separator Margin="0,20,0,20"/>
+
+                    <!-- Kazanan -->
+                    <Border x:Name="WinnerPanel"
+                            Background="#FFD700"
+                            CornerRadius="5"
+                            Padding="15">
+                        <StackPanel>
+                            <TextBlock Text="🏆 KAZANAN" 
+                                       FontSize="18" FontWeight="Bold"
+                                       HorizontalAlignment="Center"
+                                       Margin="0,0,0,10"/>
+
+                            <TextBlock x:Name="txtWinner"
+                                       FontSize="24"
+                                       FontWeight="Bold"
+                                       HorizontalAlignment="Center"
+                                       Foreground="#1976D2"/>
+
+                            <TextBlock x:Name="txtWinnerReason"
+                                       FontSize="14"
+                                       HorizontalAlignment="Center"
+                                       Margin="0,10,0,0"
+                                       TextWrapping="Wrap"
+                                       Foreground="#424242"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Border>
+
+            <!-- Yükleniyor Mesajı -->
+            <Border x:Name="LoadingPanel"
+                    Background="White"
+                    CornerRadius="5"
+                    Padding="40"
+                    Visibility="Collapsed">
+                <StackPanel HorizontalAlignment="Center">
+                    <TextBlock Text="⏳ Veriler yükleniyor..."
+                               FontSize="18"
+                               FontWeight="Bold"
+                               HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
+</Window>
