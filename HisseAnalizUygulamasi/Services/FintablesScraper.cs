@@ -138,7 +138,7 @@ namespace HisseAnalizUygulamasi.Services
 
                 if (decimal.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal result))
                 {
-                    return result * 1000;
+                    return result * 1;
                 }
 
                 return null;
