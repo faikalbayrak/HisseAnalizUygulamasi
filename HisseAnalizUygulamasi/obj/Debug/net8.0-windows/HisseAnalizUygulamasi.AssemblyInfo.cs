@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("HisseAnalizUygulamasi")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ab4c90df3aa0f057e7683bf05d6b7084ae70480b")]
 [assembly: System.Reflection.AssemblyProductAttribute("HisseAnalizUygulamasi")]
 [assembly: System.Reflection.AssemblyTitleAttribute("HisseAnalizUygulamasi")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

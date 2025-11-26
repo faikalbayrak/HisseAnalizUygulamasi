@@ -13,18 +13,15 @@ namespace HisseAnalizUygulamasi.Services
         /// </summary>
         public static void Calculate(StockData stock)
         {
-            // Formül hesaplaması
             decimal numerator = stock.TotalResources
                               + stock.LongTermLiabilities
                               + stock.ShortTermLiabilities
                               - stock.EmployeeBenefitLiabilities;
 
-            // Sıfıra bölme kontrolü
             stock.FairValue = stock.PaidInCapital != 0
                 ? numerator / stock.PaidInCapital
                 : 0;
 
-            // İskonto oranı hesabı (ters orantı)
             if (stock.CurrentPrice > 0 && stock.FairValue > 0)
             {
                 stock.DiscountRate = ((stock.FairValue - stock.CurrentPrice) / stock.FairValue) * 100;
@@ -34,7 +31,6 @@ namespace HisseAnalizUygulamasi.Services
                 stock.DiscountRate = 0;
             }
 
-            // Renk kategorisi belirleme
             DetermineCategory(stock);
         }
 

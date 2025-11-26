@@ -44,14 +44,12 @@ namespace HisseAnalizUygulamasi.Services
 
                 await Task.Delay(1000); // Rate limiting
 
-                // Yardımcı fonksiyon - bilanço değeri çeker
                 decimal? GetBalanceValue(string itemName, string sectionHeader = null)
                 {
                     HtmlNode row = null;
 
                     if (sectionHeader != null)
                     {
-                        // Belirli bölüm içinde ara
                         var section = doc.DocumentNode.SelectSingleNode(
                             $"//tbody[.//td[contains(text(), '{sectionHeader}')]]");
 
@@ -63,7 +61,6 @@ namespace HisseAnalizUygulamasi.Services
                     }
                     else
                     {
-                        // Tüm tabloda ara
                         row = doc.DocumentNode.SelectSingleNode(
                             $"//tr[.//div[contains(text(), '{itemName}')]]");
                     }
@@ -74,7 +71,6 @@ namespace HisseAnalizUygulamasi.Services
                         return null;
                     }
 
-                    // İKİNCİ td içinde "absolute" class'ı OLMAYAN tabular-nums span'ini al
                     var valueSpan = row.SelectSingleNode(
                         ".//td[2]//span[contains(@class, 'tabular-nums') and not(ancestor::*[contains(@class, 'absolute')])]");
 
@@ -90,12 +86,10 @@ namespace HisseAnalizUygulamasi.Services
                     return ParseAmount(valueText);
                 }
 
-                // Verileri çek
                 var toplamKaynaklar = GetBalanceValue("Toplam Kaynaklar");
                 var uzunVadeliYuk = GetBalanceValue("Toplam Uzun Vadeli Yükümlülükler");
                 var kisaVadeliYuk = GetBalanceValue("Toplam Kısa Vadeli Yükümlülükler");
 
-                // Çalışan borçları - hem kısa hem uzun vadeli topla
                 var calisanKisa = GetBalanceValue("Çalışanlara Sağlanan Faydalar",
                     "Kısa Vadeli Yükümlülükler") ?? 0;
                 var calisanUzun = GetBalanceValue("Çalışanlara Sağlanan Faydalar",
@@ -107,7 +101,6 @@ namespace HisseAnalizUygulamasi.Services
 
                 var odenmisSermaye = GetBalanceValue("Ödenmiş Sermaye");
 
-                // Kontrol
                 if (!toplamKaynaklar.HasValue || !uzunVadeliYuk.HasValue ||
                     !kisaVadeliYuk.HasValue || !odenmisSermaye.HasValue)
                 {
@@ -141,12 +134,10 @@ namespace HisseAnalizUygulamasi.Services
 
             try
             {
-                // "412.436.354" formatından "412436354" yap
                 text = text.Replace(".", "").Replace(",", "").Replace(" ", "").Trim();
 
                 if (decimal.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal result))
                 {
-                    // Fintables "Bin TRY" cinsinden veri veriyor
                     return result * 1000;
                 }
 
@@ -174,7 +165,6 @@ namespace HisseAnalizUygulamasi.Services
 
                 await Task.Delay(1000); // Rate limiting
 
-                // "hisse fiyatı bugün kaç TL?" içeren h3'ü bul
                 var h3Node = doc.DocumentNode.SelectSingleNode(
                     "//h3[contains(text(), 'hisse fiyatı bugün kaç TL?')]");
 
@@ -183,8 +173,6 @@ namespace HisseAnalizUygulamasi.Services
                     string h3Text = h3Node.InnerText.Trim();
                     System.Diagnostics.Debug.WriteLine($"h3 text: {h3Text}");
 
-                    // "Ard Grup Bilişim Teknolojileri A.Ş (Borsa Kodu: ARDYZ) hisse fiyatı bugün kaç TL?"
-                    // Parantez öncesi kısmı al
                     int parenIndex = h3Text.IndexOf('(');
                     if (parenIndex > 0)
                     {
@@ -220,7 +208,6 @@ namespace HisseAnalizUygulamasi.Services
 
                 await Task.Delay(1000); // Rate limiting
 
-                // "Bugün itibarıyla" ile başlayan div'i bul
                 var priceDiv = doc.DocumentNode.SelectSingleNode(
                     "//div[starts-with(text(), 'Bugün itibarıyla') or contains(., 'Bugün itibarıyla')]");
 
@@ -229,26 +216,20 @@ namespace HisseAnalizUygulamasi.Services
                     string fullText = priceDiv.InnerText;
                     System.Diagnostics.Debug.WriteLine($"Price div text: {fullText}");
 
-                    // Farklı pattern'ler dene
-
-                    // Pattern 1: "hissesinin fiyatı 31,26 TL'dir"
                     var match = Regex.Match(fullText, @"hissesinin fiyatı\s+([\d,]+)\s+TL");
 
                     if (!match.Success)
                     {
-                        // Pattern 2: "fiyatı 31,26 TL"
                         match = Regex.Match(fullText, @"fiyatı\s+([\d,]+)\s+TL");
                     }
 
                     if (!match.Success)
                     {
-                        // Pattern 3: Herhangi bir "sayı TL" formatı
                         match = Regex.Match(fullText, @"([\d,]+)\s+TL'dir");
                     }
 
                     if (!match.Success)
                     {
-                        // Pattern 4: En basit - sayı virgül sayı formatı
                         match = Regex.Match(fullText, @"(\d+,\d+)");
                     }
 
@@ -257,7 +238,6 @@ namespace HisseAnalizUygulamasi.Services
                         string priceText = match.Groups[1].Value.Trim();
                         System.Diagnostics.Debug.WriteLine($"Regex match: {priceText}");
 
-                        // Virgülü noktaya çevir
                         priceText = priceText.Replace(",", ".");
 
                         if (decimal.TryParse(priceText, NumberStyles.Any,

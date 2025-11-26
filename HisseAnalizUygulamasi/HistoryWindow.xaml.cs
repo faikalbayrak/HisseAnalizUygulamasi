@@ -51,7 +51,7 @@ namespace HisseAnalizUygulamasi
             if (cmbSymbols.SelectedItem == null) return;
 
             string selectedText = cmbSymbols.SelectedItem.ToString();
-            string symbol = selectedText.Split(' ')[0]; // "AEFES (5 kayıt)" -> "AEFES"
+            string symbol = selectedText.Split(' ')[0];
 
             LoadRecords(symbol);
         }
@@ -67,13 +67,11 @@ namespace HisseAnalizUygulamasi
                 return;
             }
 
-            // Trend analizi
             string trendAnalysis = _historyManager.GetTrendAnalysis(symbol);
             txtTrend.Text = trendAnalysis;
             txtRecordCount.Text = $"Toplam {records.Count} kayıt bulundu";
             TrendPanel.Visibility = Visibility.Visible;
 
-            // DataGrid için formatlı veriler
             var displayRecords = records.Select(r => new
             {
                 TarihStr = r.Tarih.ToString("dd.MM.yyyy HH:mm"),

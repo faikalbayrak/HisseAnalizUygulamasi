@@ -6,7 +6,7 @@ namespace HisseAnalizUygulamasi.Services
 {
     public class AppSettings
     {
-        public string Theme { get; set; } = "Light"; // "Light" veya "Dark"
+        public string Theme { get; set; } = "Light";
 
         private const string SettingsFileName = "settings.json";
 
