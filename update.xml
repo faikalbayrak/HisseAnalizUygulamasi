@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<item>
+	<version>1.0.0.0</version>
+	<url>https://github.com/faikalbayrak/HisseAnalizUygulamasi/releases/download/v1.0.0/HisseAnalizUygulamasi.zip</url>
+	<changelog>https://github.com/[GITHUB_USERNAME]/HisseAnalizUygulamasi/releases/tag/v1.0.0</changelog>
+	<mandatory>false</mandatory>
+	<checksum algorithm="SHA512">OPTIONAL_SHA512_HASH</checksum>
+</item>
