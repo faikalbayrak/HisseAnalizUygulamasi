@@ -42,32 +42,61 @@ namespace HisseAnalizUygulamasi.Services
                 var doc = new HtmlDocument();
                 doc.LoadHtml(response);
 
-                await Task.Delay(1000); // Rate limiting
+                await Task.Delay(2000); // Rate limiting
 
+                // Yardımcı fonksiyon - bilanço değeri çeker (ALTERNATİF İSİMLER İLE)
                 decimal? GetBalanceValue(string itemName, string sectionHeader = null)
                 {
                     HtmlNode row = null;
 
-                    if (sectionHeader != null)
-                    {
-                        var section = doc.DocumentNode.SelectSingleNode(
-                            $"//tbody[.//td[contains(text(), '{sectionHeader}')]]");
+                    // Alternatif isimler listesi
+                    var alternativeNames = new List<string> { itemName };
 
-                        if (section != null)
-                        {
-                            row = section.SelectSingleNode(
-                                $".//tr[.//div[contains(text(), '{itemName}')]]");
-                        }
-                    }
-                    else
+                    if (itemName == "Toplam Kaynaklar")
                     {
-                        row = doc.DocumentNode.SelectSingleNode(
-                            $"//tr[.//div[contains(text(), '{itemName}')]]");
+                        alternativeNames.Add("Toplam Aktifler");
+                        alternativeNames.Add("Toplam Varlıklar");
+                        alternativeNames.Add("Aktif Toplamı");
+                    }
+                    else if (itemName == "Toplam Uzun Vadeli Yükümlülükler")
+                    {
+                        alternativeNames.Add("Uzun Vadeli Yükümlülükler");
+                        alternativeNames.Add("Uzun Vadeli Borçlar");
+                    }
+                    else if (itemName == "Toplam Kısa Vadeli Yükümlülükler")
+                    {
+                        alternativeNames.Add("Kısa Vadeli Yükümlülükler");
+                        alternativeNames.Add("Kısa Vadeli Borçlar");
+                    }
+
+                    // Tüm alternatif isimleri dene
+                    foreach (var name in alternativeNames)
+                    {
+                        if (sectionHeader != null)
+                        {
+                            var section = doc.DocumentNode.SelectSingleNode(
+                                $"//tbody[.//td[contains(text(), '{sectionHeader}')]]");
+
+                            if (section != null)
+                            {
+                                row = section.SelectSingleNode(
+                                    $".//tr[.//div[contains(text(), '{name}')]]");
+
+                                if (row != null) break;
+                            }
+                        }
+                        else
+                        {
+                            row = doc.DocumentNode.SelectSingleNode(
+                                $"//tr[.//div[contains(text(), '{name}')]]");
+
+                            if (row != null) break;
+                        }
                     }
 
                     if (row == null)
                     {
-                        System.Diagnostics.Debug.WriteLine($"BULUNAMADI (row): {itemName}");
+                        System.Diagnostics.Debug.WriteLine($"BULUNAMADI (row): {itemName} - Tum alternatifler denendi");
                         return null;
                     }
 
@@ -81,14 +110,15 @@ namespace HisseAnalizUygulamasi.Services
                     }
 
                     string valueText = valueSpan.InnerText.Trim();
-                    System.Diagnostics.Debug.WriteLine($"BULUNDU: {itemName} = {valueText}");
+                    System.Diagnostics.Debug.WriteLine($"✓ BULUNDU: {itemName} = {valueText}");
 
                     return ParseAmount(valueText);
                 }
 
-                var toplamKaynaklar = GetBalanceValue("Toplam Kaynaklar");
-                var uzunVadeliYuk = GetBalanceValue("Toplam Uzun Vadeli Yükümlülükler");
-                var kisaVadeliYuk = GetBalanceValue("Toplam Kısa Vadeli Yükümlülükler");
+                // *** YENİ: TÜM VERİLERİ ÇEK - BULUNAMAYANLAR 0 ***
+                var toplamKaynaklar = GetBalanceValue("Toplam Kaynaklar") ?? 0;
+                var uzunVadeliYuk = GetBalanceValue("Toplam Uzun Vadeli Yükümlülükler") ?? 0;
+                var kisaVadeliYuk = GetBalanceValue("Toplam Kısa Vadeli Yükümlülükler") ?? 0;
 
                 var calisanKisa = GetBalanceValue("Çalışanlara Sağlanan Faydalar",
                     "Kısa Vadeli Yükümlülükler") ?? 0;
@@ -96,32 +126,44 @@ namespace HisseAnalizUygulamasi.Services
                     "Uzun Vadeli Yükümlülükler") ?? 0;
                 var calisanBorclari = calisanKisa + calisanUzun;
 
-                System.Diagnostics.Debug.WriteLine(
-                    $"Calisan Borclari Detay: Kisa={calisanKisa}, Uzun={calisanUzun}, Toplam={calisanBorclari}");
+                var odenmisSermaye = GetBalanceValue("Ödenmiş Sermaye") ?? 0;
 
-                var odenmisSermaye = GetBalanceValue("Ödenmiş Sermaye");
+                System.Diagnostics.Debug.WriteLine($"\nCalisan Borclari: Kisa={calisanKisa:N0}, Uzun={calisanUzun:N0}, Toplam={calisanBorclari:N0}");
 
-                if (!toplamKaynaklar.HasValue || !uzunVadeliYuk.HasValue ||
-                    !kisaVadeliYuk.HasValue || !odenmisSermaye.HasValue)
+                // *** YENİ: SADECE BÖLEN 0 İSE HATA VER ***
+                if (odenmisSermaye == 0)
                 {
-                    System.Diagnostics.Debug.WriteLine("HATA: Bazi degerler bulunamadi!");
+                    System.Diagnostics.Debug.WriteLine("⛔ HATA: Ödenmiş Sermaye 0 veya bulunamadı! Hesaplama yapılamaz.");
                     return null;
                 }
 
-                System.Diagnostics.Debug.WriteLine("=== BILANCO VERILERI BASARIYLA CEKILDI ===\n");
+                // Toplam Kaynaklar 0 ise uyarı ver ama devam et
+                if (toplamKaynaklar == 0)
+                {
+                    System.Diagnostics.Debug.WriteLine("⚠️ UYARI: Toplam Kaynaklar 0 veya bulunamadı!");
+                }
+
+                // Özet log
+                System.Diagnostics.Debug.WriteLine("\n=== BILANCO OZETI ===");
+                System.Diagnostics.Debug.WriteLine($"Toplam Kaynaklar: {toplamKaynaklar:N0} {(toplamKaynaklar == 0 ? "⚠️ (0 kabul edildi)" : "✓")}");
+                System.Diagnostics.Debug.WriteLine($"Uzun Vadeli Yük: {uzunVadeliYuk:N0} {(uzunVadeliYuk == 0 ? "⚠️ (0 kabul edildi)" : "✓")}");
+                System.Diagnostics.Debug.WriteLine($"Kısa Vadeli Yük: {kisaVadeliYuk:N0} {(kisaVadeliYuk == 0 ? "⚠️ (0 kabul edildi)" : "✓")}");
+                System.Diagnostics.Debug.WriteLine($"Çalışan Borçları: {calisanBorclari:N0} {(calisanBorclari == 0 ? "⚠️ (0 kabul edildi)" : "✓")}");
+                System.Diagnostics.Debug.WriteLine($"Ödenmiş Sermaye: {odenmisSermaye:N0} ✓");
+                System.Diagnostics.Debug.WriteLine("=== BILANCO VERILERI CEKILDI ===\n");
 
                 return new BilancoData
                 {
-                    ToplamKaynaklar = toplamKaynaklar.Value,
-                    UzunVadeliYuk = uzunVadeliYuk.Value,
-                    KisaVadeliYuk = kisaVadeliYuk.Value,
+                    ToplamKaynaklar = toplamKaynaklar,
+                    UzunVadeliYuk = uzunVadeliYuk,
+                    KisaVadeliYuk = kisaVadeliYuk,
                     CalisanBorclari = calisanBorclari,
-                    OdenmisSermaaye = odenmisSermaye.Value
+                    OdenmisSermaaye = odenmisSermaye
                 };
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"BILANCO CEKME HATASI: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"⛔ BILANCO CEKME HATASI: {ex.Message}");
                 System.Diagnostics.Debug.WriteLine($"Stack Trace: {ex.StackTrace}");
                 return null;
             }

@@ -243,18 +243,30 @@ namespace HisseAnalizUygulamasi
                 System.Diagnostics.Debug.WriteLine($"\n========== WEB'DEN VERI CEKME BASLADI ==========");
                 System.Diagnostics.Debug.WriteLine($"Sembol: {symbol}");
 
+                // 1. Bilanço verilerini çek
                 var bilancoData = await _scraper.GetBilancoDataAsync(symbol);
 
                 if (bilancoData == null)
                 {
-                    MessageBox.Show("Bilanço verileri alınamadı! Lütfen sembolü kontrol edin.",
-                        "Hata", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show(
+                        "Bilanço verileri alınamadı!\n\n" +
+                        "Olası sebepler:\n" +
+                        "• Ödenmiş Sermaye bulunamadı (hesaplama için zorunlu)\n" +
+                        "• Sembol yanlış yazılmış olabilir\n" +
+                        "• Şirketin bilançosu Fintables'da olmayabilir",
+                        "Hata",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error);
                     return;
                 }
 
+                // 2. Şirket adını çek
                 string companyName = await _scraper.FetchCompanyName(symbol);
+
+                // 3. Güncel fiyatı çek
                 decimal? currentPrice = await _scraper.GuncelFiyatCek(symbol);
 
+                // UI'ı güncelle
                 txtCompanyName.Text = companyName;
                 txtCurrentPrice.Text = currentPrice?.ToString("N2") ?? "Bulunamadı";
                 txtTotalResources.Text = bilancoData.ToplamKaynaklar.ToString("N0");
@@ -262,6 +274,32 @@ namespace HisseAnalizUygulamasi
                 txtShortTerm.Text = bilancoData.KisaVadeliYuk.ToString("N0");
                 txtEmployeeBenefits.Text = bilancoData.CalisanBorclari.ToString("N0");
                 txtPaidCapital.Text = bilancoData.OdenmisSermaaye.ToString("N0");
+
+                // *** YENİ: Eksik değerler için uyarı ***
+                var warnings = new List<string>();
+                if (bilancoData.ToplamKaynaklar == 0)
+                    warnings.Add("• Toplam Kaynaklar");
+                if (bilancoData.UzunVadeliYuk == 0)
+                    warnings.Add("• Uzun Vadeli Yükümlülükler");
+                if (bilancoData.KisaVadeliYuk == 0)
+                    warnings.Add("• Kısa Vadeli Yükümlülükler");
+                if (bilancoData.CalisanBorclari == 0)
+                    warnings.Add("• Çalışan Borçları");
+
+                string message = "Veriler başarıyla çekildi!";
+                MessageBoxImage icon = MessageBoxImage.Information;
+
+                if (warnings.Count > 0)
+                {
+                    message = $"Veriler çekildi, ancak bazı kalemler bulunamadı ve 0 kabul edildi:\n\n" +
+                              string.Join("\n", warnings) +
+                              "\n\nHesaplama bu değerlerle yapılacak.\n\n" +
+                              "Not: Bu durum bankalar ve bazı holding şirketleri için normaldir.";
+                    icon = MessageBoxImage.Warning;
+                }
+
+                MessageBox.Show(message, warnings.Count > 0 ? "Uyarı" : "Başarılı",
+                    MessageBoxButton.OK, icon);
 
                 // Adil değer hesapla
                 decimal adilDeger = (bilancoData.ToplamKaynaklar + bilancoData.UzunVadeliYuk +
@@ -275,12 +313,9 @@ namespace HisseAnalizUygulamasi
                     iskontoOrani = ((adilDeger - currentPrice.Value) / currentPrice.Value) * 100;
                 }
 
-                // *** YENİ: Geçmişe kaydet ***
+                // Geçmişe kaydet
                 _historyManager.AddRecord(symbol, companyName, bilancoData,
                     adilDeger, currentPrice, iskontoOrani);
-
-                MessageBox.Show("Veriler başarıyla çekildi ve geçmişe kaydedildi!", "Başarılı",
-                    MessageBoxButton.OK, MessageBoxImage.Information);
 
                 System.Diagnostics.Debug.WriteLine("========== VERI CEKME TAMAMLANDI ==========\n");
             }
